@@ -19,8 +19,8 @@ function processFile(inputFilePath, outputFilePath) {
   rl.on('line', (line) => {
     const strippedLine = removeComments(line);
     if (strippedLine) {
-      parse(strippedLine)
-      writer.write(strippedLine + '\n');
+      writer.write(generateComment(strippedLine))
+      writer.write(parse(strippedLine));
     }
   });
 
@@ -47,5 +47,53 @@ function removeComments(line) {
 
 function parse(line){
   const cmds = line.split(' ')
-  console.log(cmds)
+  if (cmds[0] == 'push') {
+    return handlePush(line)
+  }
+  else if (cmds[0] == 'pop') {
+    return ''//handlePop(line)
+  }
+  else if (cmds[0] == 'add') {
+    return ''//handleAdd()
+  }
+  else if (cmds[0] == 'sub') {
+    return''// handleSub()
+  }
+}
+
+function handlePush(line) {
+  let output = ''
+  const args = line.split(' ');
+  if (args[1] == 'constant') {
+    output = `@${args[2]}\n`
+    output += 'D=A\n'
+    output += '@SP\n'
+    output += 'A=M\n'
+    output += 'M=D\n'
+    output += '@SP\n'
+    output += 'M=M+1\n'
+  }
+
+
+  return output
+}
+
+function handlePop(line) {
+  let output = ''
+  const args = line.split(' ');
+  if (args[1] == 'local') {
+    output = `@${args[2]}\n`
+    output += 'D=A\n'
+    output += '@SP\n'
+    output += 'A=M\n'
+    output += 'M=D\n'
+    output += '@SP\n'
+    output += 'M=M+1\n'
+  }
+
+
+
+}
+function generateComment(line){
+  return `// ${line} \n`
 }
