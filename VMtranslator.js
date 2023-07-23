@@ -7,6 +7,9 @@ const filename = process.argv[2];
 const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
+//const stackStart = 256;
+//const localBase = 1015;
+//let stackPointer = stackStart;
 
 function processFile(inputFilePath, outputFilePath) {
   const fileStream = fs.createReadStream(inputFilePath);
@@ -64,13 +67,13 @@ function parse(line){
 function handlePush(line) {
   let output = ''
   const args = line.split(' ');
-  if (args[1] == 'constant') {
-    output = `@${args[2]}\n`
-    output += 'D=A\n'
-    output += '@SP\n'
-    output += 'A=M\n'
-    output += 'M=D\n'
-    output += '@SP\n'
+  if (args[1] == 'constant') {  
+    output = `@${args[2]}\n`  // @offset
+    output += 'D=A\n'         // D gets offset
+    output += '@SP\n'         // RAM[0]
+    output += 'A=M\n'         // Go to where SP points
+    output += 'M=D\n'         // RAM[SP] = D
+    output += '@SP\n'         // Increment pointer
     output += 'M=M+1\n'
   }
 
@@ -81,14 +84,31 @@ function handlePush(line) {
 function handlePop(line) {
   let output = ''
   const args = line.split(' ');
+  const offset = args[3]
   if (args[1] == 'local') {
-    output = `@${args[2]}\n`
-    output += 'D=A\n'
-    output += '@SP\n'
-    output += 'A=M\n'
+    // RAM[ RAM[1]+offset ] =  RAM[RAM[0]-1] 
+    // RAM[0] = RAM[0]-1  Decrement the stack pointer   
+    
+    output = `@SP\n` // 
+    // Check next line 
+    output += `D=M-1\n` // D gets RAM[RAM[0]-1]
+    output += `@temp\n` // store result in temp var
+    output += `M=D\n` 
+
+    output += `@${offset}\n`  // A get the offset
+    output += `D=A\n`   // 
+    output += `@LCL\n`  // Get local base address, stored in RAM[1]
+    output += 'A=M\n'  // 
+
+
+
+
+
+    output += `A=D+A\n`   // Prepare to write to RAM[base+offset]
     output += 'M=D\n'
+
     output += '@SP\n'
-    output += 'M=M+1\n'
+    output += 'M=M-11\n'
   }
 
 
