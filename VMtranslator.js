@@ -7,9 +7,6 @@ const filename = process.argv[2];
 const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
-//const stackStart = 256;
-//const localBase = 1015;
-//let stackPointer = stackStart;
 
 function processFile(inputFilePath, outputFilePath) {
   const fileStream = fs.createReadStream(inputFilePath);
@@ -48,21 +45,7 @@ function removeComments(line) {
   return line
 }
 
-function parse(line){
-  const cmds = line.split(' ')
-  if (cmds[0] == 'push') {
-    return handlePush(line)
-  }
-  else if (cmds[0] == 'pop') {
-    return ''//handlePop(line)
-  }
-  else if (cmds[0] == 'add') {
-    return ''//handleAdd()
-  }
-  else if (cmds[0] == 'sub') {
-    return''// handleSub()
-  }
-}
+
 
 function handlePush(line) {
   let output = ''
@@ -75,6 +58,12 @@ function handlePush(line) {
     output += 'M=D\n'         // RAM[SP] = D
     output += '@SP\n'         // Increment pointer
     output += 'M=M+1\n'
+  }
+  if (args[1] == 'static') {  
+   
+  }
+  if (args[1] == 'static') {  
+   
   }
 
 
@@ -110,10 +99,71 @@ function handlePop(line) {
     output += '@SP\n'
     output += 'M=M-11\n'
   }
-
-
-
 }
+
+
 function generateComment(line){
   return `// ${line} \n`
+}
+
+function parse(currentCmd) {
+  const cmdType = commandType(currentCmd) 
+  if (cmdType === 'C_ARITHMETIC'){
+   return writeArithmetic(currentCmd)
+  }
+  
+  if (cmdType==='C_PUSH' || cmdType==='C_POP'){
+    return writePushPop(currentCmd)
+  }
+  return 'NEITHER arith nor pushpop \n'
+}
+
+function commandType(line){
+  if (
+    line.includes('add') || line.includes('sub') || line.includes('neg')
+    || line.includes('eq') || line.includes('gt') || line.includes('lt')
+    || line.includes('and') || line.includes('or') || line.includes('not')
+    ){
+    return 'C_ARITHMETIC'
+  } 
+  if (line.includes('push')){
+    return 'C_PUSH'
+  } 
+  if (line.includes('pop')){
+    return 'C_POP'
+  } 
+  if (line.includes('label')){
+    return 'C_LABEL'
+  } 
+  if (line.includes('goto')){
+    return 'C_GOTO'
+  } 
+  if (line.includes('if')){
+    return 'C_IF'
+  } 
+  if (line.includes('function')){
+    return 'C_FUNCTION'
+  } 
+  if (line.includes('return')){
+    return 'C_RETURN'
+  } 
+  if (line.includes('call')){
+    return 'C_CALL'
+  } 
+}
+
+function writeArithmetic(currentCmd){
+  if (currentCmd.includes('add')) {
+    return 'ADDING \n'
+  }
+  return 'Other arithmetic \n'
+}
+
+function writePushPop(currentCmd){
+  if (currentCmd.includes('push')) {
+    return 'PUSHING \n'
+  }
+  else {
+    return 'POPPING \n'
+  }
 }
