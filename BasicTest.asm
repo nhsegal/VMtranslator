@@ -1,50 +1,92 @@
 // push constant 10 
-PUSHING 
+@10
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // pop local 0 
 POPPING 
 // push constant 21 
-PUSHING 
+@21
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // push constant 22 
-PUSHING 
+@22
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // pop argument 2 
 POPPING 
 // pop argument 1 
 POPPING 
 // push constant 36 
-PUSHING 
+@36
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // pop this 6 
 POPPING 
 // push constant 42 
-PUSHING 
+@42
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // push constant 45 
-PUSHING 
+@45
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // pop that 5 
 POPPING 
 // pop that 2 
 POPPING 
 // push constant 510 
-PUSHING 
+@510
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
 // pop temp 6 
 POPPING 
 // push local 0 
-PUSHING 
+@0
+D=A
+@LCL
+A=M+D
+@SP
+M=M+1
 // push that 5 
-PUSHING 
 // add 
 ADDING 
 // push argument 1 
-PUSHING 
 // sub 
 Other arithmetic 
 // push this 6 
-PUSHING 
 // push this 6 
-PUSHING 
 // add 
 ADDING 
 // sub 
 Other arithmetic 
 // push temp 6 
-PUSHING 
 // add 
 ADDING 
