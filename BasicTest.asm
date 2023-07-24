@@ -77,16 +77,16 @@ A=M+D
 M=M+1
 // push that 5 
 // add 
-ADDING 
+D=D+A
 // push argument 1 
 // sub 
-Other arithmetic 
+D=D-A
 // push this 6 
 // push this 6 
 // add 
-ADDING 
+D=D+A
 // sub 
-Other arithmetic 
+D=D-A
 // push temp 6 
 // add 
-ADDING 
+D=D+A
