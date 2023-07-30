@@ -115,35 +115,31 @@ function writePushPop(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
   if (args[0] == 'push') {
-    if (args[1] == 'constant') {
-      // CORRECT push constant args[2]
-      output += `@${args[2]}\n`; // @offset
-      output += 'D=A\n'; // D gets offset
-      output += '@SP\n'; // RAM[0]
-      output += 'A=M\n'; // Go to where SP points
-      output += 'M=D\n'; // RAM[SP] = D
-      output += '@SP\n'; // Increment pointer
-      output += 'M=M+1\n';
-    }
-    if (args[1] == 'local') {
-      output += `@${args[2]}\n`; // @offset
-      output += 'D=A\n'; // D gets offset
-      output += '@LCL\n'; // A gets 1, M gets RAM[1]
-      output += 'D=M+D\n'; //  M gets RAM[1] + D
-      output += '@SP\n'; // Increment stack pointer
-      output += 'M=M+1\n';
-    }
-    if (args[1] == 'static') {
-    }
-    return output;
-  } else if (args[0] == 'pop') {
-    output += '@LCL\n'; // A gets 1, M gets RAM[1]
-
-    output += '@SP\n'; // Decrement stack pointer
-    output += 'M=M-1\n';
-    return output;
+    output += `@${args[2]}\n`; // @offset
+    output += 'D=A\n'; // D gets offset
+    output += `${getSegment(args[1])}\n`; // A gets 1, M gets RAM[1]
+    output += 'D=M+D\n'; //  M gets RAM[1] + D
+    output += '@SP\n'; // Increment stack pointer
+    output += 'M=M+1\n';
   }
-  return 'ERROR';
+  if (args[0] == 'pop') {
+    output += '@SP\n'; 
+    output += 'M=M-1\n';
+    output += `@${args[2]}\n`;
+    output += 'D=A\n';
+    output += `@temp\n`;
+    output += `M=D\n`;
+    output += `@${getSegment(args[1])}\n`; 
+    output += `D=M\n`;
+    output += `@temp\n`;
+    output += 'M=M+D\n';
+    output += '@SP\n'; 
+    output += 'A=M\n';
+    output += 'D=M\n';
+    output += `@temp\n`;
+    output += 'A=M\n';
+    output += 'D=M\n';
+  }
 }
 
 
@@ -174,4 +170,3 @@ function getSegment(seg) {
   }
  
 }
-*/
