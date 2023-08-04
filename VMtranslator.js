@@ -36,6 +36,8 @@ const outputFilePath = path.join(
   path.basename(filename, path.extname(filename)) + '.asm'
 );
 
+
+
 processFile(inputFilePath, outputFilePath);
 
 function removeComments(line) {
@@ -100,6 +102,48 @@ function commandType(line) {
   }
 }
 
+function writePushPop(currentCmd) {
+  let output = '';
+  const args = currentCmd.split(' ');
+  if (args[0] == 'push') {
+    if (args[1] == 'constant'){
+      output += `@${args[2]}\n`; 
+      output += 'D=A\n'; 
+      output += `@SP\n`; 
+      output += 'A=M\n'; 
+      output += 'M=D\n'; 
+      output += '@SP\n'; // Increment stack pointer
+      output += 'M=M+1\n';
+    } else {
+      output += `@${args[2]}\n`; // @offset
+      output += 'D=A\n'; // D gets offset
+      output += `${getSegment(args[1])}\n`; // A gets 1, M gets RAM[1]
+      output += 'D=M+D\n'; //  M gets RAM[1] + D
+      output += '@SP\n'; // Increment stack pointer
+      output += 'M=M+1\n';
+    }
+  }
+  if (args[0] == 'pop') {
+    output += '@SP\n'; 
+    output += 'M=M-1\n';
+    output += `@${args[2]}\n`;
+    output += 'D=A\n';
+    output += `@temp\n`;
+    output += `M=D\n`;
+    output += `${getSegment(args[1])}\n`; 
+    output += `D=M\n`;
+    output += `@temp\n`;
+    output += 'M=M+D\n';
+    output += '@SP\n'; 
+    output += 'A=M\n';
+    output += 'D=M\n';
+    output += `@temp\n`;
+    output += 'A=M\n';
+    output += 'D=M\n';
+  }
+  return output
+}
+
 function writeArithmetic(currentCmd) {
   let output = '';
   if (currentCmd == 'add') {
@@ -111,54 +155,20 @@ function writeArithmetic(currentCmd) {
   return output;
 }
 
-function writePushPop(currentCmd) {
-  let output = '';
-  const args = currentCmd.split(' ');
-  if (args[0] == 'push') {
-    output += `@${args[2]}\n`; // @offset
-    output += 'D=A\n'; // D gets offset
-    output += `${getSegment(args[1])}\n`; // A gets 1, M gets RAM[1]
-    output += 'D=M+D\n'; //  M gets RAM[1] + D
-    output += '@SP\n'; // Increment stack pointer
-    output += 'M=M+1\n';
-  }
-  if (args[0] == 'pop') {
-    output += '@SP\n'; 
-    output += 'M=M-1\n';
-    output += `@${args[2]}\n`;
-    output += 'D=A\n';
-    output += `@temp\n`;
-    output += `M=D\n`;
-    output += `@${getSegment(args[1])}\n`; 
-    output += `D=M\n`;
-    output += `@temp\n`;
-    output += 'M=M+D\n';
-    output += '@SP\n'; 
-    output += 'A=M\n';
-    output += 'D=M\n';
-    output += `@temp\n`;
-    output += 'A=M\n';
-    output += 'D=M\n';
-  }
-}
-
-
 function getSegment(seg) {
   if (seg == 'local') {
-    return '@LCL\n';
+    return '@LCL';
   }
   if (seg == 'argument') {
-    return'@ARG\n';
+    return'@ARG';
   }
   if (seg == 'this') {
-    return '@THIS\n';
+    return '@THIS';
   }
   if (seg == 'that') {
-    return '@THAT\n';
+    return '@THAT';
   }
-  if (seg == 'constant') {
-    return `@${offset}\n`; 
-  }
+  // Problems below
   if (seg == 'static') {
     return;
   }
