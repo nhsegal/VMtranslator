@@ -168,16 +168,18 @@ function getSegment(seg, offset = null) {
   if (seg == 'that') {
     return '@THAT';
   }
-  // Problems below
   if (seg == 'static') {
     const varName = `${filename.split('.')[0]}.${offset}`
     return `@${varName}`;
   }
+
+  if (seg == 'temp') {
+    const loc = offset + 5
+    return `@${loc}`;
+  }
+
+  /// NEED TO DO
   if (seg == 'pointer') {
     return;
   }
-  if (seg == 'temp') {
-    return;
-  }
- 
 }
