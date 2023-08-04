@@ -117,7 +117,7 @@ function writePushPop(currentCmd) {
     } else {
       output += `@${args[2]}\n`; // @offset
       output += 'D=A\n'; // D gets offset
-      output += `${getSegment(args[1])}\n`; // A gets 1, M gets RAM[1]
+      output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
       output += 'D=M+D\n'; //  M gets RAM[1] + D
       output += '@SP\n'; // Increment stack pointer
       output += 'M=M+1\n';
@@ -155,7 +155,7 @@ function writeArithmetic(currentCmd) {
   return output;
 }
 
-function getSegment(seg) {
+function getSegment(seg, offset = null) {
   if (seg == 'local') {
     return '@LCL';
   }
@@ -170,7 +170,8 @@ function getSegment(seg) {
   }
   // Problems below
   if (seg == 'static') {
-    return;
+    const varName = `${filename.split('.')[0]}.${offset}`
+    return `@${varName}`;
   }
   if (seg == 'pointer') {
     return;

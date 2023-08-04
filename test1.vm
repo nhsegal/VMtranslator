@@ -1,1 +1,2 @@
 push constant 10
+push static 10
