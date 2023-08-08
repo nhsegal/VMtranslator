@@ -36,8 +36,6 @@ const outputFilePath = path.join(
   path.basename(filename, path.extname(filename)) + '.asm'
 );
 
-
-
 processFile(inputFilePath, outputFilePath);
 
 function removeComments(line) {
@@ -105,13 +103,16 @@ function commandType(line) {
 function writePushPop(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
+
   if (args[0] == 'push') {
-    if (args[1] == 'constant'){
-      output += `@${args[2]}\n`; 
-      output += 'D=A\n'; 
-      output += `@SP\n`; 
-      output += 'A=M\n'; 
-      output += 'M=D\n'; 
+    /// NEED TO DO pointer
+    if (args[1] == 'pointer') {
+    } else if (args[1] == 'constant') {
+      output += `@${args[2]}\n`;
+      output += 'D=A\n';
+      output += `@SP\n`;
+      output += 'A=M\n';
+      output += 'M=D\n';
       output += '@SP\n'; // Increment stack pointer
       output += 'M=M+1\n';
     } else {
@@ -124,33 +125,72 @@ function writePushPop(currentCmd) {
     }
   }
   if (args[0] == 'pop') {
-    output += '@SP\n'; 
-    output += 'M=M-1\n';
-    output += `@${args[2]}\n`;
-    output += 'D=A\n';
-    output += `@temp\n`;
-    output += `M=D\n`;
-    output += `${getSegment(args[1])}\n`; 
-    output += `D=M\n`;
-    output += `@temp\n`;
-    output += 'M=M+D\n';
-    output += '@SP\n'; 
-    output += 'A=M\n';
-    output += 'D=M\n';
-    output += `@temp\n`;
-    output += 'A=M\n';
-    output += 'D=M\n';
+    /// NEED TO DO pointer
+    if (args[1] == 'pointer') {
+    } else {
+      output += '@SP\n';
+      output += 'M=M-1\n';
+      output += `@${args[2]}\n`;
+      output += 'D=A\n';
+      output += `@temp\n`;
+      output += `M=D\n`;
+      output += `${getSegment(args[1])}\n`;
+      output += `D=M\n`;
+      output += `@temp\n`;
+      output += 'M=M+D\n';
+      output += '@SP\n';
+      output += 'A=M\n';
+      output += 'D=M\n';
+      output += `@temp\n`;
+      output += 'A=M\n';
+      output += 'D=M\n';
+    }
   }
-  return output
+  return output;
 }
 
 function writeArithmetic(currentCmd) {
   let output = '';
   if (currentCmd == 'add') {
-    output += 'D=D+A\n'  // probably wrong
+    output += '@SP\n';
+    output += 'M=M-1\n';
+    output += 'A=M\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'M=M-1\n';
+    output += 'A=M\n';
+    output += 'D=D+M\n';
+    output += 'M=D\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
   }
   if (currentCmd == 'sub') {
-    output += 'D=D-A\n'  // probably wrong
+    output += '@SP\n';
+    output += 'M=M-1\n';
+    output += 'A=M\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'M=M-1\n';
+    output += 'A=M\n';
+    output += 'D=M-D\n';
+    output += 'M=D\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'neg') {
+    output += '@SP\n';
+    output += 'M=M-1\n';
+    output += 'A=M\n';
+    output += 'M=-M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'eq') {
+    
+    return output;
   }
   return output;
 }
@@ -160,7 +200,7 @@ function getSegment(seg, offset = null) {
     return '@LCL';
   }
   if (seg == 'argument') {
-    return'@ARG';
+    return '@ARG';
   }
   if (seg == 'this') {
     return '@THIS';
@@ -169,17 +209,11 @@ function getSegment(seg, offset = null) {
     return '@THAT';
   }
   if (seg == 'static') {
-    const varName = `${filename.split('.')[0]}.${offset}`
+    const varName = `${filename.split('.')[0]}.${offset}`;
     return `@${varName}`;
   }
-
   if (seg == 'temp') {
-    const loc = offset + 5
+    const loc = offset + 5;
     return `@${loc}`;
-  }
-
-  /// NEED TO DO
-  if (seg == 'pointer') {
-    return;
   }
 }
