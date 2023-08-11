@@ -14,16 +14,16 @@ A=M
 M=D
 @SP
 M=M+1
-// push constant 16 
-@16
+// push constant 12 
+@12
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// push constant 15 
-@15
+// push constant 7 
+@7
 D=A
 @SP
 A=M

@@ -272,6 +272,38 @@ function writeArithmetic(currentCmd) {
     output += 'M=M+1\n';
     return output;
   }
+  if (currentCmd == 'and') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'MD=D&M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'or') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'MD=D|M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'not') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'M=!M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+
+
   return output;
 }
 
