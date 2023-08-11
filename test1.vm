@@ -1,5 +1,5 @@
 push constant 10
+push constant 16
 push constant 15
-push constant 15
-eq
+gt
 //pop local 2

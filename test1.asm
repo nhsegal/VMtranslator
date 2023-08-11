@@ -14,8 +14,8 @@ A=M
 M=D
 @SP
 M=M+1
-// push constant 15 
-@15
+// push constant 16 
+@16
 D=A
 @SP
 A=M
@@ -30,7 +30,7 @@ A=M
 M=D
 @SP
 M=M+1
-// eq 
+// gt 
 @SP
 AM=M-1
 D=M
@@ -45,14 +45,14 @@ M=D
 D=M
 @TEMP2
 D=M-D
-@IF_EQUALS
-D; JEQ
+@IF_GT
+D; JGT
 @SP
 A=M
 M=0
 @END
 0;JMP
-(IF_EQUALS)
+(IF_GT)
 @SP
 A=M
 M=-1

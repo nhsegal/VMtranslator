@@ -198,7 +198,78 @@ function writeArithmetic(currentCmd) {
     output += '(END)\n';
     output += '@SP\n';
     output += 'M=M+1\n';
-    
+    return output;
+  }
+  if (currentCmd == 'gt') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP1\n';
+    output += 'M=D\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'M=D\n';
+
+    output += '@TEMP1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'D=M-D\n';
+
+    output += '@IF_GT\n';
+    output += 'D; JGT\n';
+
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=0\n';
+    output += '@END\n';
+    output += '0;JMP\n';
+
+    output += '(IF_GT)\n';
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=-1\n';
+
+    output += '(END)\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'lt') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP1\n';
+    output += 'M=D\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'M=D\n';
+
+    output += '@TEMP1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'D=M-D\n';
+
+    output += '@IF_LT\n';
+    output += 'D; JLT\n';
+
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=0\n';
+    output += '@END\n';
+    output += '0;JMP\n';
+
+    output += '(IF_LT)\n';
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=-1\n';
+
+    output += '(END)\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
     return output;
   }
   return output;
