@@ -16,7 +16,22 @@ function processFile(inputFilePath, outputFilePath) {
     ctrlDelay: Infinity,
   });
 
+  let start = true;
+
   rl.on('line', (line) => {
+    // Initialization - Comment out later
+    if (start){
+      start = false;
+      writer.write('@256\n')
+      writer.write('D=A\n')
+      writer.write('@SP\n')
+      writer.write('M=D\n')
+      writer.write('@1015\n')
+      writer.write('D=A\n')
+      writer.write('@LCL\n')
+      writer.write('M=D\n')
+    }
+
     const strippedLine = removeComments(line);
     if (strippedLine) {
       writer.write(generateComment(strippedLine));
@@ -50,16 +65,171 @@ function generateComment(line) {
 }
 
 function parse(currentCmd) {
-  const cmdType = commandType(currentCmd);
-  if (cmdType === 'C_ARITHMETIC') {
-    return writeArithmetic(currentCmd);
-  }
-  if (cmdType === 'C_PUSH' || cmdType === 'C_POP') {
+  const cmdArgs = currentCmd.split(' ') 
+  if (cmdArgs.length == 3) {
     return writePushPop(currentCmd);
+  }
+  if (cmdArgs.length == 2) {
+    return writeLogic(currentCmd);
+  }
+  if (cmdArgs.length == 1) {
+    return writeArithmetic(currentCmd);
   }
   return 'ERROR: NEITHER arith nor pushpop \n';
 }
 
+
+function writePushPop(currentCmd) {
+  let output = '';
+  const args = currentCmd.split(' ');
+
+  if (args[0] == 'push') {
+    /// NEED TO DO pointer
+    if (args[1] == 'pointer') {
+      output += 'NOT YET IMPLEMENTED POINTER\n';
+    } else if (args[1] == 'constant') {
+      output += `@${args[2]}\n`;
+      output += 'D=A\n';
+      output += `@SP\n`;
+      output += 'A=M\n';
+      output += 'M=D\n';
+      output += '@SP\n'; // Increment stack pointer
+      output += 'M=M+1\n';
+    } else {
+      output += `@${args[2]}\n`; // @offset
+      output += 'D=A\n'; // D gets offset
+      output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
+      output += 'D=M+D\n'; //  M gets RAM[1] + D
+      output += '@SP\n'; // Increment stack pointer
+      output += 'M=M+1\n';
+    }
+  }
+  if (args[0] == 'pop') {
+    /// NEED TO DO pointer
+    if (args[1] == 'pointer') {
+      output += 'NOT YET IMPLEMENTED POINTER\n';
+    } else {
+      output += '@SP\n';
+      output += 'M=M-1\n';
+      output += `@${args[2]}\n`;
+      output += 'D=A\n';
+      output += `@temp\n`;
+      output += `M=D\n`;
+      output += `${getSegment(args[1])}\n`;
+      output += `D=M\n`;
+      output += `@temp\n`;
+      output += 'M=M+D\n';
+      output += '@SP\n';
+      output += 'AD=M\n';
+      output += `@temp\n`;
+      output += 'AD=M\n';
+    }
+  }
+  return output;
+}
+
+function writeLogic(currentCmd) {
+  return ''
+}
+
+function writeArithmetic(currentCmd) {
+  let output = '';
+  if (currentCmd == 'add') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'MD=D+M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'sub') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'MD=M-D\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'neg') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'M=-M\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    return output;
+  }
+  if (currentCmd == 'eq') {
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP1\n';
+    output += 'M=D\n';
+    output += '@SP\n';
+    output += 'AM=M-1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'M=D\n';
+
+    output += '@TEMP1\n';
+    output += 'D=M\n';
+    output += '@TEMP2\n';
+    output += 'D=M-D\n';
+
+    output += '@IF_EQUALS\n';
+    output += 'D; JEQ\n';
+
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=0\n';
+    output += '@END\n';
+    output += '0;JMP\n';
+
+    output += '(IF_EQUALS)\n';
+    output += '@SP\n';
+    output += 'A=M\n';
+    output += 'M=-1\n';
+
+    output += '(END)\n';
+    output += '@SP\n';
+    output += 'M=M+1\n';
+    
+    return output;
+  }
+  return output;
+}
+
+function getSegment(seg, offset = null) {
+  if (seg == 'local') {
+    return '@LCL';
+  }
+  if (seg == 'argument') {
+    return '@ARG';
+  }
+  if (seg == 'this') {
+    return '@THIS';
+  }
+  if (seg == 'that') {
+    return '@THAT';
+  }
+  if (seg == 'static') {
+    const varName = `${filename.split('.')[0]}.${offset}`;
+    return `@${varName}`;
+  }
+  if (seg == 'temp') {
+    const loc = offset + 5;
+    return `@${loc}`;
+  }
+}
+
+
+
+/*
 function commandType(line) {
   if (
     line.includes('add') ||
@@ -99,121 +269,4 @@ function commandType(line) {
     return 'C_CALL';
   }
 }
-
-function writePushPop(currentCmd) {
-  let output = '';
-  const args = currentCmd.split(' ');
-
-  if (args[0] == 'push') {
-    /// NEED TO DO pointer
-    if (args[1] == 'pointer') {
-    } else if (args[1] == 'constant') {
-      output += `@${args[2]}\n`;
-      output += 'D=A\n';
-      output += `@SP\n`;
-      output += 'A=M\n';
-      output += 'M=D\n';
-      output += '@SP\n'; // Increment stack pointer
-      output += 'M=M+1\n';
-    } else {
-      output += `@${args[2]}\n`; // @offset
-      output += 'D=A\n'; // D gets offset
-      output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
-      output += 'D=M+D\n'; //  M gets RAM[1] + D
-      output += '@SP\n'; // Increment stack pointer
-      output += 'M=M+1\n';
-    }
-  }
-  if (args[0] == 'pop') {
-    /// NEED TO DO pointer
-    if (args[1] == 'pointer') {
-    } else {
-      output += '@SP\n';
-      output += 'M=M-1\n';
-      output += `@${args[2]}\n`;
-      output += 'D=A\n';
-      output += `@temp\n`;
-      output += `M=D\n`;
-      output += `${getSegment(args[1])}\n`;
-      output += `D=M\n`;
-      output += `@temp\n`;
-      output += 'M=M+D\n';
-      output += '@SP\n';
-      output += 'A=M\n';
-      output += 'D=M\n';
-      output += `@temp\n`;
-      output += 'A=M\n';
-      output += 'D=M\n';
-    }
-  }
-  return output;
-}
-
-function writeArithmetic(currentCmd) {
-  let output = '';
-  if (currentCmd == 'add') {
-    output += '@SP\n';
-    output += 'M=M-1\n';
-    output += 'A=M\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'M=M-1\n';
-    output += 'A=M\n';
-    output += 'D=D+M\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    return output;
-  }
-  if (currentCmd == 'sub') {
-    output += '@SP\n';
-    output += 'M=M-1\n';
-    output += 'A=M\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'M=M-1\n';
-    output += 'A=M\n';
-    output += 'D=M-D\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    return output;
-  }
-  if (currentCmd == 'neg') {
-    output += '@SP\n';
-    output += 'M=M-1\n';
-    output += 'A=M\n';
-    output += 'M=-M\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    return output;
-  }
-  if (currentCmd == 'eq') {
-    
-    return output;
-  }
-  return output;
-}
-
-function getSegment(seg, offset = null) {
-  if (seg == 'local') {
-    return '@LCL';
-  }
-  if (seg == 'argument') {
-    return '@ARG';
-  }
-  if (seg == 'this') {
-    return '@THIS';
-  }
-  if (seg == 'that') {
-    return '@THAT';
-  }
-  if (seg == 'static') {
-    const varName = `${filename.split('.')[0]}.${offset}`;
-    return `@${varName}`;
-  }
-  if (seg == 'temp') {
-    const loc = offset + 5;
-    return `@${loc}`;
-  }
-}
+*/

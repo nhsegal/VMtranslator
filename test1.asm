@@ -1,3 +1,11 @@
+@256
+D=A
+@SP
+M=D
+@1015
+D=A
+@LCL
+M=D
 // push constant 10 
 @10
 D=A
@@ -6,10 +14,48 @@ A=M
 M=D
 @SP
 M=M+1
-// push static 10 
-@10
+// push constant 15 
+@15
 D=A
-@test1.10
-D=M+D
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// push constant 15 
+@15
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// eq 
+@SP
+AM=M-1
+D=M
+@TEMP1
+M=D
+@SP
+AM=M-1
+D=M
+@TEMP2
+M=D
+@TEMP1
+D=M
+@TEMP2
+D=M-D
+@IF_EQUALS
+D; JEQ
+@SP
+A=M
+M=0
+@END
+0;JMP
+(IF_EQUALS)
+@SP
+A=M
+M=-1
+(END)
 @SP
 M=M+1

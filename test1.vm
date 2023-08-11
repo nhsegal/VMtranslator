@@ -1,2 +1,5 @@
 push constant 10
-push static 10
+push constant 15
+push constant 15
+eq
+//pop local 2
