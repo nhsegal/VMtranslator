@@ -34,16 +34,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_GT
 D; JGT

@@ -113,15 +113,16 @@ function writePushPop(currentCmd) {
       output += 'M=M-1\n';
       output += `@${args[2]}\n`;
       output += 'D=A\n';
-      output += `@temp\n`;
+      //R5 is temp var
+      output += `@R5\n`;
       output += `M=D\n`;
       output += `${getSegment(args[1])}\n`;
       output += `D=M\n`;
-      output += `@temp\n`;
+      output += `@R5\n`;
       output += 'M=M+D\n';
       output += '@SP\n';
       output += 'AD=M\n';
-      output += `@temp\n`;
+      output += `@R5\n`;
       output += 'AD=M\n';
     }
   }
@@ -168,17 +169,18 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP1\n';
+    // R5, R6 temp vars
+    output += '@R5\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'M=D\n';
 
-    output += '@TEMP1\n';
+    output += '@R5\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'D=M-D\n';
 
     output += '@IF_EQUALS\n';
@@ -204,17 +206,17 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP1\n';
+    output += '@R5\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'M=D\n';
 
-    output += '@TEMP1\n';
+    output += '@R5\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'D=M-D\n';
 
     output += '@IF_GT\n';
@@ -240,17 +242,17 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP1\n';
+    output += '@R5\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'M=D\n';
 
-    output += '@TEMP1\n';
+    output += '@R5\n';
     output += 'D=M\n';
-    output += '@TEMP2\n';
+    output += '@R6\n';
     output += 'D=M-D\n';
 
     output += '@IF_LT\n';

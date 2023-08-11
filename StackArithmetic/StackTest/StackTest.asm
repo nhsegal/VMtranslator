@@ -26,16 +26,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_EQUALS
 D; JEQ
@@ -71,16 +71,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_EQUALS
 D; JEQ
@@ -116,16 +116,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_EQUALS
 D; JEQ
@@ -161,16 +161,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_LT
 D; JLT
@@ -206,16 +206,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_LT
 D; JLT
@@ -251,16 +251,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_LT
 D; JLT
@@ -296,16 +296,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_GT
 D; JGT
@@ -341,16 +341,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_GT
 D; JGT
@@ -386,16 +386,16 @@ M=M+1
 @SP
 AM=M-1
 D=M
-@TEMP1
+@R5
 M=D
 @SP
 AM=M-1
 D=M
-@TEMP2
+@R6
 M=D
-@TEMP1
+@R5
 D=M
-@TEMP2
+@R6
 D=M-D
 @IF_GT
 D; JGT
@@ -468,6 +468,14 @@ M=-M
 @SP
 M=M+1
 // and 
+@SP
+AM=M-1
+D=M
+@SP
+AM=M-1
+MD=D&M
+@SP
+M=M+1
 // push constant 82 
 @82
 D=A
@@ -477,4 +485,17 @@ M=D
 @SP
 M=M+1
 // or 
+@SP
+AM=M-1
+D=M
+@SP
+AM=M-1
+MD=D|M
+@SP
+M=M+1
 // not 
+@SP
+AM=M-1
+M=!M
+@SP
+M=M+1
