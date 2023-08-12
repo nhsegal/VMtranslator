@@ -6,14 +6,6 @@ M=D
 D=A
 @LCL
 M=D
-// push constant 10 
-@10
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
 // push constant 12 
 @12
 D=A
@@ -22,40 +14,24 @@ A=M
 M=D
 @SP
 M=M+1
-// push constant 7 
-@7
+// push constant 5 
+@5
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-// gt 
+// pop local 2 
 @SP
-AM=M-1
-D=M
+MD=M-1
+@2
+D=A
 @R5
 M=D
-@SP
-AM=M-1
+@LCL
 D=M
-@R6
-M=D
 @R5
-D=M
-@R6
-D=M-D
-@IF_GT
-D; JGT
-@SP
+M=M+D
 A=M
-M=0
-@END
-0;JMP
-(IF_GT)
-@SP
-A=M
-M=-1
-(END)
-@SP
-M=M+1
+M=D

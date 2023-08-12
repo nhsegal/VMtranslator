@@ -1,11 +1,3 @@
-@256
-D=A
-@SP
-M=D
-@1015
-D=A
-@LCL
-M=D
 // push constant 10 
 @10
 D=A
@@ -26,9 +18,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // push constant 21 
 @21
 D=A
@@ -57,9 +51,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // pop argument 1 
 @SP
 M=M-1
@@ -72,9 +68,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // push constant 36 
 @36
 D=A
@@ -95,9 +93,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // push constant 42 
 @42
 D=A
@@ -126,9 +126,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // pop that 2 
 @SP
 M=M-1
@@ -141,9 +143,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // push constant 510 
 @510
 D=A
@@ -164,9 +168,11 @@ D=M
 @R5
 M=M+D
 @SP
-AD=M
+A=M
+D=M
 @R5
-AD=M
+A=M
+M=D
 // push local 0 
 @0
 D=A

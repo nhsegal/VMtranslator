@@ -19,9 +19,11 @@ function processFile(inputFilePath, outputFilePath) {
   let start = true;
 
   rl.on('line', (line) => {
-    // Initialization - Comment out later
+    // Initialization - Comment out 
+    
     if (start){
       start = false;
+      /*
       writer.write('@256\n')
       writer.write('D=A\n')
       writer.write('@SP\n')
@@ -30,6 +32,7 @@ function processFile(inputFilePath, outputFilePath) {
       writer.write('D=A\n')
       writer.write('@LCL\n')
       writer.write('M=D\n')
+      */
     }
 
     const strippedLine = removeComments(line);
@@ -121,9 +124,11 @@ function writePushPop(currentCmd) {
       output += `@R5\n`;
       output += 'M=M+D\n';
       output += '@SP\n';
-      output += 'AD=M\n';
+      output += 'A=M\n';
+      output += 'D=M\n';
       output += `@R5\n`;
-      output += 'AD=M\n';
+      output += 'A=M\n';
+      output += 'M=D\n';
     }
   }
   return output;
