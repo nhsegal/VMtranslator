@@ -106,7 +106,13 @@ function writePushPop(currentCmd) {
       output += `@${args[2]}\n`; // @offset
       output += 'D=A\n'; // D gets offset
       output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
-      output += 'A=D+A\n'; 
+      if (args[1] == 'temp'){
+        output += `A=D+A\n`;
+      } else {
+        output += `A=D+M\n`;
+      }
+      
+      //output += 'A=D+A\n'; 
       output += 'D=M\n'; 
       output += '@SP\n'; 
       output += 'A=M\n'; 

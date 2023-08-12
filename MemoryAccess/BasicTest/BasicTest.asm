@@ -177,7 +177,7 @@ M=D
 @0
 D=A
 @LCL
-A=D+A
+A=D+M
 D=M
 @SP
 A=M
@@ -188,7 +188,7 @@ M=M+1
 @5
 D=A
 @THAT
-A=D+A
+A=D+M
 D=M
 @SP
 A=M
@@ -208,7 +208,7 @@ M=M+1
 @1
 D=A
 @ARG
-A=D+A
+A=D+M
 D=M
 @SP
 A=M
@@ -228,7 +228,7 @@ M=M+1
 @6
 D=A
 @THIS
-A=D+A
+A=D+M
 D=M
 @SP
 A=M
@@ -239,7 +239,7 @@ M=M+1
 @6
 D=A
 @THIS
-A=D+A
+A=D+M
 D=M
 @SP
 A=M
