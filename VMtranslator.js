@@ -102,10 +102,15 @@ function writePushPop(currentCmd) {
       output += '@SP\n'; // Increment stack pointer
       output += 'M=M+1\n';
     } else {
+       // ISSUE with push
       output += `@${args[2]}\n`; // @offset
       output += 'D=A\n'; // D gets offset
       output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
-      output += 'D=M+D\n'; //  M gets RAM[1] + D
+      output += 'A=D+A\n'; 
+      output += 'D=M\n'; 
+      output += '@SP\n'; 
+      output += 'A=M\n'; 
+      output += 'M=D\n'; 
       output += '@SP\n'; // Increment stack pointer
       output += 'M=M+1\n';
     }
@@ -339,10 +344,11 @@ function getSegment(seg, offset = null) {
   }
   if (seg == 'temp') {
     // There might be a problem here
-    console.log('here')
-    console.log(offset)
-    const loc =  5; // Why not 5?
-    return `@${loc}`;
+    //console.log('here')
+    //console.log(offset)
+    //const loc =  5; // Why not 5?
+    //return `@${loc}`;
+    return '@5'
   }
 }
 

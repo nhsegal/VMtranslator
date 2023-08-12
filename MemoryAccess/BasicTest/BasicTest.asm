@@ -177,14 +177,22 @@ M=D
 @0
 D=A
 @LCL
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // push that 5 
 @5
 D=A
 @THAT
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // add 
@@ -200,7 +208,11 @@ M=M+1
 @1
 D=A
 @ARG
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // sub 
@@ -216,14 +228,22 @@ M=M+1
 @6
 D=A
 @THIS
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // push this 6 
 @6
 D=A
 @THIS
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // add 
@@ -248,7 +268,11 @@ M=M+1
 @6
 D=A
 @5
-D=M+D
+A=D+A
+D=M
+@SP
+A=M
+M=D
 @SP
 M=M+1
 // add 
