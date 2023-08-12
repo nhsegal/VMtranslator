@@ -43,7 +43,10 @@ function processFile(inputFilePath, outputFilePath) {
   });
 
   rl.on('close', () => {
-    console.log('Processing done');
+    console.log('Processing done'); 
+    writer.write('(END)\n')
+    writer.write('@END\n')
+    writer.write('0;JMP\n')
     writer.end();
   });
 }
@@ -116,17 +119,21 @@ function writePushPop(currentCmd) {
       output += 'M=M-1\n';
       output += `@${args[2]}\n`;
       output += 'D=A\n';
-      //R5 is temp var
-      output += `@R5\n`;
+      //R13 is temp var
+      output += `@R13\n`;
       output += `M=D\n`;
       output += `${getSegment(args[1])}\n`;
-      output += `D=M\n`;
-      output += `@R5\n`;
+      if (args[1] == 'temp'){
+        output += `D=A\n`;
+      } else {
+        output += `D=M\n`;
+      }
+      output += `@R13\n`;
       output += 'M=M+D\n';
       output += '@SP\n';
       output += 'A=M\n';
       output += 'D=M\n';
-      output += `@R5\n`;
+      output += `@R13\n`;
       output += 'A=M\n';
       output += 'M=D\n';
     }
@@ -174,18 +181,17 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    // R5, R6 temp vars
-    output += '@R5\n';
+    // R13, R14 temp vars
+    output += '@R13\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'M=D\n';
-
-    output += '@R5\n';
+    output += '@R13\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'D=M-D\n';
 
     output += '@IF_EQUALS\n';
@@ -211,17 +217,17 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@R5\n';
+    output += '@R13\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'M=D\n';
 
-    output += '@R5\n';
+    output += '@R13\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'D=M-D\n';
 
     output += '@IF_GT\n';
@@ -247,17 +253,17 @@ function writeArithmetic(currentCmd) {
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@R5\n';
+    output += '@R13\n';
     output += 'M=D\n';
     output += '@SP\n';
     output += 'AM=M-1\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'M=D\n';
 
-    output += '@R5\n';
+    output += '@R13\n';
     output += 'D=M\n';
-    output += '@R6\n';
+    output += '@R14\n';
     output += 'D=M-D\n';
 
     output += '@IF_LT\n';
@@ -332,7 +338,10 @@ function getSegment(seg, offset = null) {
     return `@${varName}`;
   }
   if (seg == 'temp') {
-    const loc = offset + 5;
+    // There might be a problem here
+    console.log('here')
+    console.log(offset)
+    const loc =  5; // Why not 5?
     return `@${loc}`;
   }
 }
