@@ -90,9 +90,19 @@ function writePushPop(currentCmd) {
   const args = currentCmd.split(' ');
 
   if (args[0] == 'push') {
-    /// NEED TO DO pointer
     if (args[1] == 'pointer') {
-      output += 'NOT YET IMPLEMENTED POINTER\n';
+      if (args[2] == 0) {
+        output += '@THIS\n';      
+      }
+      if (args[2] == 1) {
+        output += '@THAT\n'; 
+      }
+      output += 'D=M\n'; 
+      output += '@SP\n'; 
+      output += 'A=M\n'; 
+      output += 'M=D\n'; 
+      output += '@SP\n'; // Increment stack pointer
+      output += 'M=M+1\n';
     } else if (args[1] == 'constant') {
       output += `@${args[2]}\n`;
       output += 'D=A\n';
@@ -102,7 +112,6 @@ function writePushPop(currentCmd) {
       output += '@SP\n'; // Increment stack pointer
       output += 'M=M+1\n';
     } else {
-       // ISSUE with push
       output += `@${args[2]}\n`; // @offset
       output += 'D=A\n'; // D gets offset
       output += `${getSegment(args[1], args[2])}\n`; // A gets 1, M gets RAM[1]
@@ -111,8 +120,6 @@ function writePushPop(currentCmd) {
       } else {
         output += `A=D+M\n`;
       }
-      
-      //output += 'A=D+A\n'; 
       output += 'D=M\n'; 
       output += '@SP\n'; 
       output += 'A=M\n'; 
@@ -122,9 +129,21 @@ function writePushPop(currentCmd) {
     }
   }
   if (args[0] == 'pop') {
-    /// NEED TO DO pointer
     if (args[1] == 'pointer') {
-      output += 'NOT YET IMPLEMENTED POINTER\n';
+      output += '@SP\n';
+      output += 'M=M-1\n';
+      output += 'A=M\n';
+      output += 'D=M\n';
+
+      if (args[2] == 0) {
+        output += '@THIS\n';      
+      }
+      if (args[2] == 1) {
+        output += '@THAT\n'; 
+      }
+
+      output += `M=D\n`;
+
     } else {
       output += '@SP\n';
       output += 'M=M-1\n';
