@@ -84,11 +84,19 @@ function parse(currentCmd) {
   return 'ERROR: NEITHER arith nor pushpop.\n';
 }
 
-
+// Really all 3 term commands, inc function
 function writePushPop(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
+  if (args[0] == 'function'){
 
+    return output
+  }
+  if (args[0] == 'call'){
+  
+    return output
+  }
+  
   if (args[0] == 'push') {
     if (args[1] == 'pointer') {
       if (args[2] == 0) {
@@ -175,7 +183,7 @@ function writeLogic(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
   if (args[0] == 'goto'){
-    output += `@${args[0]}\n`
+    output += `@${args[1]}\n`
     output += '0; JMP\n'
     return output
   }
@@ -189,9 +197,11 @@ function writeLogic(currentCmd) {
     return output
   }
   if (args[0] == 'label'){
-    output += `(${args[0]})\n`
+    output += `(${args[1]})\n`
     return output
   }
+
+
   return 'ERROR: unknown command\n';
 }
 
