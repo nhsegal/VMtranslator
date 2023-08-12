@@ -81,7 +81,7 @@ function parse(currentCmd) {
   if (cmdArgs.length == 1) {
     return writeArithmetic(currentCmd);
   }
-  return 'ERROR: NEITHER arith nor pushpop \n';
+  return 'ERROR: NEITHER arith nor pushpop.\n';
 }
 
 
@@ -172,7 +172,27 @@ function writePushPop(currentCmd) {
 }
 
 function writeLogic(currentCmd) {
-  return ''
+  let output = '';
+  const args = currentCmd.split(' ');
+  if (args[0] == 'goto'){
+    output += `@${args[0]}\n`
+    output += '0; JMP\n'
+    return output
+  }
+  if (args[0] == 'if-goto'){
+    output += `@SP\n`
+    output += 'A=M-1\n'
+    output += 'D=M\n'
+    output += 'D; JLT\n'
+    output += `@SP\n`
+    output += 'M=M-1\n'
+    return output
+  }
+  if (args[0] == 'label'){
+    output += `(${args[0]})\n`
+    return output
+  }
+  return 'ERROR: unknown command\n';
 }
 
 function writeArithmetic(currentCmd) {
