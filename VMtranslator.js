@@ -1,3 +1,10 @@
+/*
+To do: 
+ change program to handle directories.
+ unit test writeCall - particularly $ret counter
+
+*/
+
 if (process.argv.length < 3) {
   console.log('Usage: node ' + process.argv[1] + ' FILENAME');
   process.exit(1);
@@ -132,10 +139,13 @@ function writeCall(currentCmd) {
   output += 'D=M\n';
   output += '@LCL\n';
   output += 'M=D\n';
-  // goto foo
-  write2WordCmd(`goto ${callerName}`);
 
-  output += `(${returnAddress})`;
+  //write2WordCmd(`goto ${callerName}`);
+  // goto retAdd
+  output += '@R14\n';
+  output += 'A=M\n';
+  output += '0; JMP\n';
+  output += `(${callerName})`;
 
   return output;
 }
@@ -176,7 +186,6 @@ function repositionArg(currentCmd) {
 }
 
 function writePush(currentCmd) {
-  
   let output = '';
   const args = currentCmd.split(' ');
   if (args[1] == 'pointer') {
@@ -451,17 +460,17 @@ function write1WordCmd(currentCmd) {
 function writeReturn() {
   let output = '';
   // frame = LCL
-  output += '@LCL\n'
-  output += 'D=M\n'
-  output += '@R13\n' //R13 is frame
-  output += 'M=D\n'
+  output += '@LCL\n';
+  output += 'D=M\n';
+  output += '@R13\n'; //R13 is frame
+  output += 'M=D\n';
   // retAddr = *(frame - 5)
-  output += '@5\n' // Exp with adding in nArgs
-  output += 'D=D-A\n'
-  output += 'A=D\n'
-  output += 'D=M\n'
-  output += '@R14\n'
-  output += 'M=D\n'
+  output += '@5\n'; // Exp with adding in nArgs
+  output += 'D=D-A\n';
+  output += 'A=D\n';
+  output += 'D=M\n';
+  output += '@R14\n';
+  output += 'M=D\n';
   // *ARG = pop()
   output += '@SP\n';
   output += 'M=M-1\n';
@@ -470,49 +479,47 @@ function writeReturn() {
   output += '@ARG\n';
   output += 'A=M\n';
   output += 'M=D\n';
-  
+
   // SP = ARG + 1
   output += '@ARG\n';
   output += 'D=M+1\n';
   output += '@SP\n';
   output += 'M=D\n';
   // THAT = *(frame -1)
-  output += '@R13\n'
+  output += '@R13\n';
   output += 'A=M-1\n';
   output += 'D=M\n';
   output += '@THAT\n';
   output += 'M=D\n';
   // THIS = *(frame -2)
-  output += '@R13\n'
+  output += '@R13\n';
   output += 'A=M-1\n';
   output += 'A=A-1\n';
   output += 'D=M\n';
   output += '@THIS\n';
   output += 'M=D\n';
-   // ARG = *(frame -3)
-  output += '@R13\n'
+  // ARG = *(frame -3)
+  output += '@R13\n';
   output += 'A=M-1\n';
   output += 'A=A-1\n';
   output += 'A=A-1\n';
   output += 'D=M\n';
-   output += '@ARG\n';
-   output += 'M=D\n';
-    // LCL = *(frame -4)
-    output += '@R13\n'
-    output += 'A=M-1\n';
-    output += 'A=A-1\n';
-    output += 'A=A-1\n';
-    output += 'A=A-1\n';
-    output += 'D=M\n';
-    output += '@LCL\n';
-    output += 'M=D\n';
-   // goto retAdd
-   output += '@R14\n'
-   output += 'A=M\n'
-
-  // output += `@${filename.split('.')[0]}.${calleeName}\n`;
-   output += '0; JMP\n';
-   return output;
+  output += '@ARG\n';
+  output += 'M=D\n';
+  // LCL = *(frame -4)
+  output += '@R13\n';
+  output += 'A=M-1\n';
+  output += 'A=A-1\n';
+  output += 'A=A-1\n';
+  output += 'A=A-1\n';
+  output += 'D=M\n';
+  output += '@LCL\n';
+  output += 'M=D\n';
+  // goto retAdd
+  output += '@R14\n';
+  output += 'A=M\n';
+  output += '0; JMP\n';
+  return output;
 }
 
 function getSegment(seg, offset = null) {
