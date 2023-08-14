@@ -73,7 +73,7 @@ function generateComment(line) {
 function parse(currentCmd) {
   const cmdArgs = currentCmd.split(' ');
   if (cmdArgs.length == 3) {
-    return write3WordCmd(currentCmd);
+   return write3WordCmd(currentCmd);
   }
   if (cmdArgs.length == 2) {
     return write2WordCmd(currentCmd);
@@ -85,7 +85,6 @@ function parse(currentCmd) {
 }
 
 function write3WordCmd(currentCmd) {
-  let output = '';
   const args = currentCmd.split(' ');
   if (args[0] == 'function') {
     return writeFunction(currentCmd);
@@ -214,6 +213,7 @@ function writePush(currentCmd){
     output += '@SP\n'; // Increment stack pointer
     output += 'M=M+1\n';
   }
+  return output
 }
 
 function writePop(currentCmd){
@@ -256,6 +256,7 @@ function writePop(currentCmd){
     output += 'A=M\n';
     output += 'M=D\n';
   }
+  return output
 }
 
 
