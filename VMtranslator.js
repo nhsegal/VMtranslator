@@ -176,6 +176,7 @@ function repositionArg(currentCmd) {
 }
 
 function writePush(currentCmd) {
+  
   let output = '';
   const args = currentCmd.split(' ');
   if (args[1] == 'pointer') {
@@ -452,10 +453,10 @@ function writeReturn() {
   // frame = LCL
   output += '@LCL\n'
   output += 'D=M\n'
-  output += '@R13\n'
+  output += '@R13\n' //R13 is frame
   output += 'M=D\n'
   // retAddr = *(frame - 5)
-  output += '@5\n'
+  output += '@5\n' // Exp with adding in nArgs
   output += 'D=D-A\n'
   output += 'A=D\n'
   output += 'D=M\n'
@@ -471,24 +472,38 @@ function writeReturn() {
   output += 'M=D\n';
   
   // SP = ARG + 1
+  output += '@ARG\n';
   output += 'D=M+1\n';
   output += '@SP\n';
   output += 'M=D\n';
   // THAT = *(frame -1)
   output += '@R13\n'
-  output += 'D=M-1\n';
+  output += 'A=M-1\n';
+  output += 'D=M\n';
   output += '@THAT\n';
   output += 'M=D\n';
   // THIS = *(frame -2)
-  output += 'D=D-1\n';
+  output += '@R13\n'
+  output += 'A=M-1\n';
+  output += 'A=A-1\n';
+  output += 'D=M\n';
   output += '@THIS\n';
   output += 'M=D\n';
    // ARG = *(frame -3)
-   output += 'D=D-1\n';
+  output += '@R13\n'
+  output += 'A=M-1\n';
+  output += 'A=A-1\n';
+  output += 'A=A-1\n';
+  output += 'D=M\n';
    output += '@ARG\n';
    output += 'M=D\n';
     // LCL = *(frame -4)
-    output += 'D=D-1\n';
+    output += '@R13\n'
+    output += 'A=M-1\n';
+    output += 'A=A-1\n';
+    output += 'A=A-1\n';
+    output += 'A=A-1\n';
+    output += 'D=M\n';
     output += '@LCL\n';
     output += 'M=D\n';
    // goto retAdd

@@ -1,6 +1,3 @@
-push constant 12
-push constant 0
-push constant 1
-pop local 2
-pop local 3
-pop local 4
+function testFunction 0
+ push constant 2
+ return

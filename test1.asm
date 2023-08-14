@@ -1,78 +1,50 @@
-// push constant 12 
-@12
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant 0 
-@0
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// push constant 1 
-@1
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-// pop local 2 
-@SP
-M=M-1
+// function testFunction 0 
+(test1.testFunction)
+// push constant 2 
 @2
 D=A
-@R13
+@SP
+A=M
 M=D
+@SP
+M=M+1
+// return 
 @LCL
 D=M
 @R13
-M=M+D
-@SP
-A=M
-D=M
-@R13
-A=M
 M=D
-// pop local 3 
+@7
+D=D-A
+A=D
+D=M
+@R14
+M=D
 @SP
 M=M-1
-@3
-D=A
-@R13
+A=M
+D=M
+@ARG
+A=M
 M=D
+D=M+1
+@SP
+M=D
+@R13
+D=M-1
+@THAT
+M=D
+D=D-1
+@THIS
+M=D
+D=D-1
+@ARG
+M=D
+D=D-1
 @LCL
-D=M
-@R13
-M=M+D
-@SP
-A=M
-D=M
-@R13
-A=M
 M=D
-// pop local 4 
-@SP
-M=M-1
-@4
-D=A
-@R13
-M=D
-@LCL
-D=M
-@R13
-M=M+D
-@SP
+@R14
 A=M
-D=M
-@R13
-A=M
-M=D
+0; JMP
 (END)
 @END
 0;JMP
