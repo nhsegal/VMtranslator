@@ -274,20 +274,24 @@ function write2WordCmd(currentCmd) {
   }
   if (args[0] == 'if-goto') {
     output += `@SP\n`;
-    output += 'A=M-1\n';
+    output += 'AM=M-1\n';
     output += 'D=M\n';
+    output += `@${args[1]}\n`;
     output += 'D; JNE\n';
-    output += `@SP\n`;
-    output += 'M=M-1\n';
+  //  output += `@SP\n`;
+  //  output += 'M=M-1\n';
     return output;
   }
   if (args[0] == 'label') {
     output += `(${args[1]})\n`;
     return output;
   }
-
-  return 'ERROR: unknown command\n';
+  return 'ERROR: unknown 2 word command\n';
 }
+
+
+
+
 
 function write1WordCmd(currentCmd) {
   let output = '';
@@ -337,21 +341,17 @@ function write1WordCmd(currentCmd) {
     output += 'D=M\n';
     output += '@R14\n';
     output += 'D=M-D\n';
-
     output += '@IF_EQUALS\n';
     output += 'D; JEQ\n';
-
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=0\n';
     output += '@END\n';
     output += '0;JMP\n';
-
     output += '(IF_EQUALS)\n';
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=-1\n';
-
     output += '(END)\n';
     output += '@SP\n';
     output += 'M=M+1\n';
@@ -368,26 +368,21 @@ function write1WordCmd(currentCmd) {
     output += 'D=M\n';
     output += '@R14\n';
     output += 'M=D\n';
-
     output += '@R13\n';
     output += 'D=M\n';
     output += '@R14\n';
     output += 'D=M-D\n';
-
     output += '@IF_GT\n';
     output += 'D; JGT\n';
-
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=0\n';
     output += '@END\n';
     output += '0;JMP\n';
-
     output += '(IF_GT)\n';
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=-1\n';
-
     output += '(END)\n';
     output += '@SP\n';
     output += 'M=M+1\n';
@@ -404,26 +399,21 @@ function write1WordCmd(currentCmd) {
     output += 'D=M\n';
     output += '@R14\n';
     output += 'M=D\n';
-
     output += '@R13\n';
     output += 'D=M\n';
     output += '@R14\n';
     output += 'D=M-D\n';
-
     output += '@IF_LT\n';
     output += 'D; JLT\n';
-
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=0\n';
     output += '@END\n';
     output += '0;JMP\n';
-
     output += '(IF_LT)\n';
     output += '@SP\n';
     output += 'A=M\n';
     output += 'M=-1\n';
-
     output += '(END)\n';
     output += '@SP\n';
     output += 'M=M+1\n';

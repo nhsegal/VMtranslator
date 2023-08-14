@@ -131,11 +131,10 @@ M=D
 M=M+1
 // if-goto LOOP_START 
 @SP
-A=M-1
+AM=M-1
 D=M
+@LOOP_START
 D; JNE
-@SP
-M=M-1
 // push local 0 
 @0
 D=A
