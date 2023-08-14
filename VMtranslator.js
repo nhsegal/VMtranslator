@@ -8,6 +8,9 @@ const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
 
+let callerName = '';
+let calleeName = '';
+
 function processFile(inputFilePath, outputFilePath) {
   const fileStream = fs.createReadStream(inputFilePath);
   const writer = fs.createWriteStream(outputFilePath, { flags: 'w' });
@@ -21,16 +24,13 @@ function processFile(inputFilePath, outputFilePath) {
   rl.on('line', (line) => {
     if (start) {
       start = false;
-      // Initialization - Comment out
+      // Bootstrap code
       /*
       writer.write('@256\n')
       writer.write('D=A\n')
       writer.write('@SP\n')
       writer.write('M=D\n')
-      writer.write('@1015\n')
-      writer.write('D=A\n')
-      writer.write('@LCL\n')
-      writer.write('M=D\n')
+      writer.write('call Sys.init\n')
       */
     }
 
@@ -73,7 +73,7 @@ function generateComment(line) {
 function parse(currentCmd) {
   const cmdArgs = currentCmd.split(' ');
   if (cmdArgs.length == 3) {
-   return write3WordCmd(currentCmd);
+    return write3WordCmd(currentCmd);
   }
   if (cmdArgs.length == 2) {
     return write2WordCmd(currentCmd);
@@ -90,90 +90,92 @@ function write3WordCmd(currentCmd) {
     return writeFunction(currentCmd);
   }
   if (args[0] == 'call') {
-    return writeCall(currentCmd)
+    return writeCall(currentCmd);
   }
 
   if (args[0] == 'push') {
-    return writePush(currentCmd)   
+    return writePush(currentCmd);
   }
   if (args[0] == 'pop') {
-    return writePop(currentCmd)
+    return writePop(currentCmd);
   }
   return 'Error: unrecognized 3 word command.';
 }
 
-function writeFunction(currentCmd){
+function writeFunction(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
-  return output
+  calleeName = args[1];
+  const nArgs = args[2];
+  // function entry label
+  output += `(${filename.split('.')[0]}.${calleeName})\n`;
+  for (let i = 0; i < nArgs; i++) {
+    output += writePush('push local 0');
+  }
+  return output;
 }
 
-function writeCall(currentCmd){
+function writeCall(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
-      // save caller's frame
-    //???? push return address
-    output += '@SP\n';
-    output += 'A=M\n';
-    output += `(${args[1].label})\n`;
-    // save LCL
-    output += '@LCL\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'A=M\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    // save ARG
-    output += '@ARG\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'A=M\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    // saved THIS
-    output += '@THIS\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'A=M\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    // saved THAT
-    output += '@THAT\n';
-    output += 'D=M\n';
-    output += '@SP\n';
-    output += 'A=M\n';
-    output += 'M=D\n';
-    output += '@SP\n';
-    output += 'M=M+1\n';
-    //  reposition arg
-    output += '@SP\n';
-    output += 'D=M\n';
-    output += `@${args[2]}\n`;
-    output += 'D=D-A\n';
-    output += 'D=D-5\n';
-    output += '@ARG\n';
-    output += 'M=D\n';
-    // LCL = SP
-    output += '@SP\n';
-    output += 'D=M\n';
-    output += '@LCL\n';
-    output += 'M=D\n';
-    // goto foo
-    output += `@${args[1]}\n`;
-    output += '0;JMP\n';
+  callerName = args[1];
+  //push return address
+  //output += '@SP\n';
+  //output += 'A=M\n';
+  //output += `(${args[1].label})\n`;
+  output += `(${filename.split('.')[0]}.${callerName}$ret.${callnumber})`; // need to handle call number
 
-    output += `(${returnAddress})`;
+  output += saveFrame();
+  output += repositionArg(currentCmd);
+  // LCL = SP
+  output += '@SP\n';
+  output += 'D=M\n';
+  output += '@LCL\n';
+  output += 'M=D\n';
+  // goto foo
+  write2WordCmd(`goto ${callerName}`);
 
-    //*output += `(${args[1]}$ret.${})\n`;
+  output += `(${returnAddress})`;
 
-    return output;
- 
+  return output;
 }
 
-function writePush(currentCmd){
+function saveFrame() {
+  let output = '';
+  output += saveSeg('@LCL');
+  output += saveSeg('@ARG');
+  output += saveSeg('@THIS');
+  output += saveSeg('@THAT');
+  return output;
+}
+
+function saveSeg(seg) {
+  let output = '';
+  output += `${seg}\n`;
+  output += 'D=M\n';
+  output += '@SP\n';
+  output += 'A=M\n';
+  output += 'M=D\n';
+  output += '@SP\n';
+  output += 'M=M+1\n';
+  return output;
+}
+
+function repositionArg(currentCmd) {
+  let output = '';
+  const args = currentCmd.split(' ');
+  output += '@SP\n';
+  output += 'D=M\n';
+  output += `@${args[2]}\n`;
+  output += 'D=D-A\n';
+  output += '@5\n';
+  output += 'D=D-A\n';
+  output += '@ARG\n';
+  output += 'M=D\n';
+  return output;
+}
+
+function writePush(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
   if (args[1] == 'pointer') {
@@ -213,10 +215,10 @@ function writePush(currentCmd){
     output += '@SP\n'; // Increment stack pointer
     output += 'M=M+1\n';
   }
-  return output
+  return output;
 }
 
-function writePop(currentCmd){
+function writePop(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
   if (args[1] == 'pointer') {
@@ -256,13 +258,8 @@ function writePop(currentCmd){
     output += 'A=M\n';
     output += 'M=D\n';
   }
-  return output
+  return output;
 }
-
-
-
-
-
 
 function write2WordCmd(currentCmd) {
   let output = '';
@@ -286,10 +283,6 @@ function write2WordCmd(currentCmd) {
   }
   return 'ERROR: unknown 2 word command\n';
 }
-
-
-
-
 
 function write1WordCmd(currentCmd) {
   let output = '';
@@ -447,8 +440,64 @@ function write1WordCmd(currentCmd) {
     output += 'M=M+1\n';
     return output;
   }
+  if (currentCmd == 'return') {
+    output += writeReturn();
+    return output;
+  }
+  return 'ERROR: Unknown one word command.';
+}
 
-  return output;
+function writeReturn() {
+  let output = '';
+  // frame = LCL
+  output += '@LCL\n'
+  output += 'D=M\n'
+  output += '@R13\n'
+  output += 'M=D\n'
+  // retAddr = *(frame - 5)
+  output += '@5\n'
+  output += 'D=D-A\n'
+  output += 'A=D\n'
+  output += 'D=M\n'
+  output += '@R14\n'
+  output += 'M=D\n'
+  // *ARG = pop()
+  output += '@SP\n';
+  output += 'M=M-1\n';
+  output += 'A=M\n';
+  output += 'D=M\n';
+  output += '@ARG\n';
+  output += 'A=M\n';
+  output += 'M=D\n';
+  
+  // SP = ARG + 1
+  output += 'D=M+1\n';
+  output += '@SP\n';
+  output += 'M=D\n';
+  // THAT = *(frame -1)
+  output += '@R13\n'
+  output += 'D=M-1\n';
+  output += '@THAT\n';
+  output += 'M=D\n';
+  // THIS = *(frame -2)
+  output += 'D=D-1\n';
+  output += '@THIS\n';
+  output += 'M=D\n';
+   // ARG = *(frame -3)
+   output += 'D=D-1\n';
+   output += '@ARG\n';
+   output += 'M=D\n';
+    // LCL = *(frame -4)
+    output += 'D=D-1\n';
+    output += '@LCL\n';
+    output += 'M=D\n';
+   // goto retAdd
+   output += '@R14\n'
+   output += 'A=M\n'
+
+  // output += `@${filename.split('.')[0]}.${calleeName}\n`;
+   output += '0; JMP\n';
+   return output;
 }
 
 function getSegment(seg, offset = null) {

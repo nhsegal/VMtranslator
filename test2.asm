@@ -1,6 +1,9 @@
-// push constant 10 
-@10
+// push local 0 
+@0
 D=A
+@LCL
+A=D+M
+D=M
 @SP
 A=M
 M=D
