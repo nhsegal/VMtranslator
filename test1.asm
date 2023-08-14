@@ -1,11 +1,3 @@
-@256
-D=A
-@SP
-M=D
-@1015
-D=A
-@LCL
-M=D
 // push constant 12 
 @12
 D=A
@@ -14,8 +6,16 @@ A=M
 M=D
 @SP
 M=M+1
-// push constant 5 
-@5
+// push constant 0 
+@0
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+// push constant 1 
+@1
 D=A
 @SP
 A=M
@@ -24,14 +24,55 @@ M=D
 M=M+1
 // pop local 2 
 @SP
-MD=M-1
+M=M-1
 @2
 D=A
-@R5
+@R13
 M=D
 @LCL
 D=M
-@R5
+@R13
 M=M+D
+@SP
+A=M
+D=M
+@R13
 A=M
 M=D
+// pop local 3 
+@SP
+M=M-1
+@3
+D=A
+@R13
+M=D
+@LCL
+D=M
+@R13
+M=M+D
+@SP
+A=M
+D=M
+@R13
+A=M
+M=D
+// pop local 4 
+@SP
+M=M-1
+@4
+D=A
+@R13
+M=D
+@LCL
+D=M
+@R13
+M=M+D
+@SP
+A=M
+D=M
+@R13
+A=M
+M=D
+(END)
+@END
+0;JMP
