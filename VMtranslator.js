@@ -278,8 +278,6 @@ function write2WordCmd(currentCmd) {
     output += 'D=M\n';
     output += `@${args[1]}\n`;
     output += 'D; JNE\n';
-  //  output += `@SP\n`;
-  //  output += 'M=M-1\n';
     return output;
   }
   if (args[0] == 'label') {
