@@ -1,8 +1,6 @@
 /*
 To do: 
- change program to handle directories.
  unit test writeCall - particularly $ret counter
-
 */
 
 if (process.argv.length < 3) {
@@ -10,60 +8,92 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-const filename = process.argv[2];
+const fileOrDirname = process.argv[2];
 const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
+const statsObj = fs.statSync(fileOrDirname);
 
 let callerName = '';
 let calleeName = '';
+let started = false;
+let totalFilesToProcess = 0;
+let filesProcessed = 0;
 
 function processFile(inputFilePath, outputFilePath) {
+  const writeOptions = { flags: append ? 'a' : 'w' }; 
   const fileStream = fs.createReadStream(inputFilePath);
-  const writer = fs.createWriteStream(outputFilePath, { flags: 'w' });
+  const writer = fs.createWriteStream(outputFilePath, writeOptions);
   const rl = readline.createInterface({
     input: fileStream,
     ctrlDelay: Infinity,
   });
 
-  let start = true;
+
 
   rl.on('line', (line) => {
-    if (start) {
-      start = false;
+    if (!started) {
+      start = true;
       // Bootstrap code
-      /*
       writer.write('@256\n')
       writer.write('D=A\n')
       writer.write('@SP\n')
       writer.write('M=D\n')
-      writer.write('call Sys.init\n')
-      */
+      writer.write('call Sys.init\n')  
     }
-
     const strippedLine = removeComments(line);
     if (strippedLine) {
       writer.write(generateComment(strippedLine));
       writer.write(parse(strippedLine));
     }
   });
-
+///*** Find a way to only do this at the very end
   rl.on('close', () => {
     console.log('Processing done');
-    writer.write('(END)\n');
-    writer.write('@END\n');
-    writer.write('0;JMP\n');
+    filesProcessed++;
+    if (filesProcessed === totalFilesToProcess){
+      writer.write('(END)\n');
+      writer.write('@END\n');
+      writer.write('0;JMP\n');
+   
+    }
     writer.end();
   });
 }
 
-const inputFilePath = filename;
+const inputFilePath = fileOrDirName;
 const outputFilePath = path.join(
-  path.dirname(filename),
-  path.basename(filename, path.extname(filename)) + '.asm'
+  path.dirname(filename), 'source.asm'
 );
 
-processFile(inputFilePath, outputFilePath);
+function processDir(inputDirPath, outputFilePath) {
+  fs.readdir(inputDirPath, (err, files) => {
+    if (err) {
+      console.log(err);
+      process.exit(-1);
+
+    } else {
+      totalFilesToProcess = files.length;
+      const append = totalFilesToProcess > 1;
+      files.forEach((file) => {
+        const fullFilePath = path.join(inputDirPath, file);
+        processFile(fullFilePath, outputFilePath, append);
+      })
+    }
+  })
+}
+
+
+if (statsObj.isFile()) {
+  processFile(inputFilePath, outputFilePath, false); // Not appending for individual file
+}
+
+if (statsObj.isDirectory()) {
+  processDir(inputFilePath, outputFilePath);
+}
+
+
+
 
 function removeComments(line) {
   let trimmed = line.split('//')[0].trim();
