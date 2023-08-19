@@ -8,11 +8,17 @@ if (process.argv.length < 3) {
   process.exit(1);
 }
 
-const fileOrDirname = process.argv[2];
+const fileOrDirName = process.argv[2];
 const path = require('path');
 const readline = require('readline');
 const fs = require('fs');
-const statsObj = fs.statSync(fileOrDirname);
+const statsObj = fs.statSync(fileOrDirName);
+
+
+const inputFilePath = fileOrDirName;
+const outputFilePath = path.join(
+  path.dirname(fileOrDirName), `${fileOrDirName.split('.')[0]}.asm`
+);
 
 let callerName = '';
 let calleeName = '';
@@ -20,7 +26,8 @@ let started = false;
 let totalFilesToProcess = 0;
 let filesProcessed = 0;
 
-function processFile(inputFilePath, outputFilePath) {
+function processFile(inputFilePath, outputFilePath, append) {
+  console.log('processing file')
   const writeOptions = { flags: append ? 'a' : 'w' }; 
   const fileStream = fs.createReadStream(inputFilePath);
   const writer = fs.createWriteStream(outputFilePath, writeOptions);
@@ -29,11 +36,14 @@ function processFile(inputFilePath, outputFilePath) {
     ctrlDelay: Infinity,
   });
 
-
+  // {functionName, numberOfCalls}
+  const listOfFunctions = []
 
   rl.on('line', (line) => {
+    console.log(started)
     if (!started) {
-      start = true;
+      started = true;
+      console.log('starting')
       // Bootstrap code
       writer.write('@256\n')
       writer.write('D=A\n')
@@ -44,10 +54,9 @@ function processFile(inputFilePath, outputFilePath) {
     const strippedLine = removeComments(line);
     if (strippedLine) {
       writer.write(generateComment(strippedLine));
-      writer.write(parse(strippedLine));
+      writer.write(parse(strippedLine, listOfFunctions));
     }
   });
-///*** Find a way to only do this at the very end
   rl.on('close', () => {
     console.log('Processing done');
     filesProcessed++;
@@ -55,29 +64,29 @@ function processFile(inputFilePath, outputFilePath) {
       writer.write('(END)\n');
       writer.write('@END\n');
       writer.write('0;JMP\n');
-   
     }
     writer.end();
   });
 }
 
-const inputFilePath = fileOrDirName;
-const outputFilePath = path.join(
-  path.dirname(filename), 'source.asm'
-);
+
 
 function processDir(inputDirPath, outputFilePath) {
   fs.readdir(inputDirPath, (err, files) => {
     if (err) {
       console.log(err);
       process.exit(-1);
-
     } else {
       totalFilesToProcess = files.length;
       const append = totalFilesToProcess > 1;
       files.forEach((file) => {
-        const fullFilePath = path.join(inputDirPath, file);
-        processFile(fullFilePath, outputFilePath, append);
+       // console.log(path.extname(file) )
+        if (path.extname(file) == '.vm'){
+          console.log('here')
+          const fullFilePath = path.join(inputDirPath, file);
+          processFile(fullFilePath, outputFilePath, append);
+        }
+       
       })
     }
   })
@@ -89,11 +98,8 @@ if (statsObj.isFile()) {
 }
 
 if (statsObj.isDirectory()) {
-  processDir(inputFilePath, outputFilePath);
+  processDir(inputFilePath, outputFilePath, true);
 }
-
-
-
 
 function removeComments(line) {
   let trimmed = line.split('//')[0].trim();
@@ -107,10 +113,10 @@ function generateComment(line) {
   return `// ${line} \n`;
 }
 
-function parse(currentCmd) {
+function parse(currentCmd, listOfFunctions) {
   const cmdArgs = currentCmd.split(' ');
   if (cmdArgs.length == 3) {
-    return write3WordCmd(currentCmd);
+    return write3WordCmd(currentCmd, listOfFunctions);
   }
   if (cmdArgs.length == 2) {
     return write2WordCmd(currentCmd);
@@ -121,12 +127,19 @@ function parse(currentCmd) {
   return 'ERROR: Command length not recognized.\n';
 }
 
-function write3WordCmd(currentCmd) {
+function write3WordCmd(currentCmd, listOfFunctions) {
   const args = currentCmd.split(' ');
   if (args[0] == 'function') {
     return writeFunction(currentCmd);
   }
   if (args[0] == 'call') {
+    // if listOfFunctions contains arg[1] increase its counter
+    if (listOfFunctions.find(obj => obj.functionName == `${args[1]}`)){
+      listOfFunctions.find(obj => obj.functionName == `${args[1]}`).callCount++
+    }
+    else {
+      listOfFunctions.push({functionName: `${args[1]}`, callCount: 0})
+    }
     return writeCall(currentCmd);
   }
 
@@ -145,23 +158,18 @@ function writeFunction(currentCmd) {
   calleeName = args[1];
   const nArgs = args[2];
   // function entry label
-  output += `(${filename.split('.')[0]}.${calleeName})\n`;
+  output += `(${fileOrDirName.split('.')[0]}.${calleeName})\n`;
   for (let i = 0; i < nArgs; i++) {
     output += writePush('push local 0');
   }
   return output;
 }
 
-function writeCall(currentCmd) {
+function writeCall(currentCmd, i) {
   let output = '';
   const args = currentCmd.split(' ');
   callerName = args[1];
-  //push return address
-  //output += '@SP\n';
-  //output += 'A=M\n';
-  //output += `(${args[1].label})\n`;
-  output += `(${filename.split('.')[0]}.${callerName}$ret.${callnumber})`; // need to handle call number
-
+  output += `(${fileOrDirName.split('.')[0]}.${callerName}$ret.${i})`; // need to handle call number
   output += saveFrame();
   output += repositionArg(currentCmd);
   // LCL = SP

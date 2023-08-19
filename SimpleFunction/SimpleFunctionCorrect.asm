@@ -1,8 +1,3 @@
-@256
-D=A
-@SP
-M=D
-call Sys.init
 // function SimpleFunction.test 2 
 (SimpleFunction.SimpleFunction.test)
 @0
@@ -153,3 +148,6 @@ M=D
 @R14
 A=M
 0; JMP
+(END)
+@END
+0;JMP
