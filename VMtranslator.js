@@ -51,6 +51,7 @@ function processFile(inputFilePath, outputFilePath, append) {
       writer.write('@SP\n')
       writer.write('M=D\n')
       //writer.write('call Sys.init\n')  
+      writer.write(write3WordCmd('call Sys.init 0', listOfFunctions))
     }
     const strippedLine = removeComments(line);
     if (strippedLine) {
@@ -338,7 +339,7 @@ function write2WordCmd(currentCmd) {
     output += `(${args[1]})\n`;
     return output;
   }
-  return 'ERROR: unknown 2 word command\n';
+  return `ERROR: unknown 2 word command: ${currentCmd}`;
 }
 
 function write1WordCmd(currentCmd) {
@@ -583,7 +584,7 @@ function getSegment(seg, offset = null) {
     return '@THAT';
   }
   if (seg == 'static') {
-    const varName = `${filename.split('.')[0]}.${offset}`;
+    const varName = `${fileName.split('.')[0]}.${offset}`;
     return `@${varName}`;
   }
   if (seg == 'temp') {
