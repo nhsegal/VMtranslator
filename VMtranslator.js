@@ -23,11 +23,14 @@ const outputFilePath = path.join(
 let callerName = '';
 let calleeName = '';
 let started = false;
-let totalFilesToProcess = 0;
+let totalFilesToProcess = 1;
 let filesProcessed = 0;
+let fileName = '';
 
 function processFile(inputFilePath, outputFilePath, append) {
   console.log('processing file')
+  fileName = path.basename(inputFilePath, '.vm')
+  console.log(fileName)
   const writeOptions = { flags: append ? 'a' : 'w' }; 
   const fileStream = fs.createReadStream(inputFilePath);
   const writer = fs.createWriteStream(outputFilePath, writeOptions);
@@ -40,16 +43,14 @@ function processFile(inputFilePath, outputFilePath, append) {
   const listOfFunctions = []
 
   rl.on('line', (line) => {
-    console.log(started)
     if (!started) {
       started = true;
-      console.log('starting')
       // Bootstrap code
       writer.write('@256\n')
       writer.write('D=A\n')
       writer.write('@SP\n')
       writer.write('M=D\n')
-      writer.write('call Sys.init\n')  
+      //writer.write('call Sys.init\n')  
     }
     const strippedLine = removeComments(line);
     if (strippedLine) {
@@ -82,7 +83,6 @@ function processDir(inputDirPath, outputFilePath) {
       files.forEach((file) => {
        // console.log(path.extname(file) )
         if (path.extname(file) == '.vm'){
-          console.log('here')
           const fullFilePath = path.join(inputDirPath, file);
           processFile(fullFilePath, outputFilePath, append);
         }
@@ -140,7 +140,8 @@ function write3WordCmd(currentCmd, listOfFunctions) {
     else {
       listOfFunctions.push({functionName: `${args[1]}`, callCount: 0})
     }
-    return writeCall(currentCmd);
+    console.log(listOfFunctions.find(obj => obj.functionName == `${args[1]}`).callCount)
+    return writeCall(currentCmd, listOfFunctions.find(obj => obj.functionName == `${args[1]}`).callCount);
   }
 
   if (args[0] == 'push') {
@@ -155,10 +156,10 @@ function write3WordCmd(currentCmd, listOfFunctions) {
 function writeFunction(currentCmd) {
   let output = '';
   const args = currentCmd.split(' ');
-  calleeName = args[1];
+  callerName = args[1];
   const nArgs = args[2];
   // function entry label
-  output += `(${fileOrDirName.split('.')[0]}.${calleeName})\n`;
+  output += `(${fileName}.${callerName}$${calleeName})\n`;
   for (let i = 0; i < nArgs; i++) {
     output += writePush('push local 0');
   }
@@ -168,8 +169,18 @@ function writeFunction(currentCmd) {
 function writeCall(currentCmd, i) {
   let output = '';
   const args = currentCmd.split(' ');
-  callerName = args[1];
-  output += `(${fileOrDirName.split('.')[0]}.${callerName}$ret.${i})`; // need to handle call number
+  // push return address XXX.foo$ret.i
+  // where XXX is file name, foo is function name and i is call count 
+  calleeName = args[1];
+  const retLabel = `${fileName}.${callerName}$ret.${i}`
+  output += `@${retLabel}\n`;
+  output += 'D=A\n';
+  output += `@SP\n`;
+  output += 'A=M\n';
+  output += 'M=D\n';
+  output += '@SP\n'; 
+  output += 'M=M+1\n';
+ 
   output += saveFrame();
   output += repositionArg(currentCmd);
   // LCL = SP
@@ -183,8 +194,7 @@ function writeCall(currentCmd, i) {
   output += '@R14\n';
   output += 'A=M\n';
   output += '0; JMP\n';
-  output += `(${callerName})`;
-
+  output += `(${fileName}.${callerName}$ret.${i})\n`
   return output;
 }
 
@@ -281,7 +291,6 @@ function writePop(currentCmd) {
     if (args[2] == 1) {
       output += '@THAT\n';
     }
-
     output += `M=D\n`;
   } else {
     output += '@SP\n';
